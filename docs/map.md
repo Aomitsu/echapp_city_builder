@@ -34,3 +34,57 @@ Ce mode cache tout les bâtiments, mais permets d'assigner, sous forme de tiles 
 
 ### Mode Construction
 Permets la construction de routes, parcs, et autres infrastructures...
+
+## Technique
+### Map Lifecycle
+
+```Rust
+pub struct CityMap {
+    pub blocks: HashMap<IVec2, FloorType>,
+    pub selector: Option<IVec2>,
+    /// map_size x map_size, doesn't count decorative blocks under the map
+    pub map_size: i32,
+
+}
+
+pub struct FloorType {
+    pub assignation: CityAssignation,
+
+    // TODO: + Some things related to texturing and animations
+}
+
+pub enum CityAssignation {
+    Residential,
+    Commercial,
+    Industrial,
+    /// Can't be assigned ( Parks, Roads, Special infrastructures, )
+    CantBeAssigned,
+    #[default]
+    Nothing,
+}
+```
+```Rust
+impl CityMap {
+    /// Create a new simple map FILE, 3x3 with a Starter Road (TODO: Special infrastructures)
+    fn new() -> Self {} 
+
+    //TODO: Load
+
+    /// Create map FILE in the WORLD ( New map, or Saved map )
+    fn summon() -> Self {}
+
+    /// Kill the map from the WORLD
+    fn kill() {}
+
+    /// Refresh the WORLD display
+    /// 
+    /// EX: IF Selector is OUTSIDE the map, display all
+    /// 
+    /// EX: IF Selector is IN THE BACK the map, display the back correctly but not the FRONT
+    fn refresh() -> Self {}
+}
+```
+Donc, une `CityMap` va vivre de cette façon :
+Elle sera créée `CityMap::new()` ou load `CityMap::load()`, affichée avec `CityMap::summon()`, raffraîchie avec `CityMap::refresh()` puis kill avec `CityMap::kill()` si on quitte la map, qu'on en load une autre, etc...
+
+TODO: Tout ce qui se fera sur la map ( a savoir les infra et habitations ) sont à penser juste après.
