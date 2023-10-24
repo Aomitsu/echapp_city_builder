@@ -24,7 +24,7 @@ pub struct TextureAssets {
     #[asset(path = "icon.png")]
     pub texture_icon: Handle<Image>,
     #[asset(path = "textures/floor.png")]
-    pub texture_floor_grass: Handle<Image>,
+    pub texture_floor: Handle<Image>,
     #[asset(path = "textures/selector.png")]
     pub texture_selector: Handle<Image>,
 }

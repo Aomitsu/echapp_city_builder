@@ -1,5 +1,6 @@
 use bevy::prelude::*;
 
+pub mod world;
 pub struct MapPlugin;
 
 impl Plugin for MapPlugin {
@@ -7,3 +8,4 @@ impl Plugin for MapPlugin {
         
     }
 }
+

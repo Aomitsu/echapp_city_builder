@@ -78,6 +78,8 @@ impl CityMap {
 
     /// Refresh the WORLD display
     /// 
+    /// EX: IF Assignation mode, don't display buildings
+    /// 
     /// EX: IF Selector is OUTSIDE the map, display all
     /// 
     /// EX: IF Selector is IN THE BACK the map, display the back correctly but not the FRONT

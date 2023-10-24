@@ -22,3 +22,6 @@ bevy_asset_loader = { version = "0.17" }
 # keep the following in sync with Bevy's dependencies
 image = { version = "0.24", default-features = false }
 winit = { version = "0.28", default-features = false }
+
+[target.'cfg(debug_assertions)'.dependencies]
+bevy-inspector-egui = "0.20.0"
