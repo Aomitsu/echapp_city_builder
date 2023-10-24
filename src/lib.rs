@@ -5,9 +5,11 @@ use bevy::prelude::*;
 
 mod loading;
 mod menu;
+mod map;
 
 use loading::LoadingPlugin;
 use menu::MenuPlugin;
+use map::MapPlugin;
 
 
 #[derive(States, Default, Clone, Eq, PartialEq, Debug, Hash)]
@@ -25,6 +27,7 @@ impl Plugin for GamePlugin {
         app.add_state::<GameState>().add_plugins((
             LoadingPlugin,
             MenuPlugin,
+            MapPlugin,
         ));
 
         #[cfg(debug_assertions)]
