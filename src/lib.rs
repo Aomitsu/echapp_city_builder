@@ -8,7 +8,9 @@ use bevy::prelude::*;
 mod loading;
 mod menu;
 mod map;
+mod camera;
 
+use camera::CameraPlugin;
 use loading::LoadingPlugin;
 use menu::MenuPlugin;
 use map::MapPlugin;
@@ -30,6 +32,7 @@ impl Plugin for GamePlugin {
             LoadingPlugin,
             MenuPlugin,
             MapPlugin,
+            CameraPlugin,
         ));
 
         #[cfg(debug_assertions)]

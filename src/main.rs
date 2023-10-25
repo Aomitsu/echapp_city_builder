@@ -6,13 +6,25 @@
 
 use std::io::Cursor;
 
-use bevy::{prelude::*, winit::WinitWindows, window::PrimaryWindow};
+use bevy::{prelude::*, winit::WinitWindows, window::{PrimaryWindow, PresentMode}};
 use echapp_city_builder::GamePlugin;
 use winit::window::Icon;
 
 fn main() {
     App::new()
-        .add_plugins(DefaultPlugins)
+    .add_plugins(
+        DefaultPlugins
+            .set(WindowPlugin {
+                primary_window: Some(Window {
+                    present_mode: PresentMode::Immediate,
+                    resizable: false,
+                    title: "City Builder".into(),
+                    ..default()
+                }),
+                ..default()
+            })
+            //.set(ImagePlugin::default_nearest()),
+    )
         .add_plugins(GamePlugin)
         .add_systems(Startup, (setup, set_window_icon))
         .run();
