@@ -16,9 +16,10 @@ impl Plugin for MapPlugin {
 }
 
 fn startup(mut commands: Commands, assets: Res<TextureAssets>) {
+    // OpenTTD Default Map Size + 1
     let map_size = TilemapSize {
-        x: QUADRANT_SIDE_LENGTH * 2,
-        y: QUADRANT_SIDE_LENGTH * 2,
+        x: 257,
+        y: 257,
     };
     let quadrant_size = TilemapSize {
         x: QUADRANT_SIDE_LENGTH,
@@ -29,42 +30,35 @@ fn startup(mut commands: Commands, assets: Res<TextureAssets>) {
     let tilemap_id = TilemapId(tilemap_entity);
     
     fill_tilemap_rect(
-        TileTextureIndex(0),
-        TilePos { x: 0, y: 0 },
-        quadrant_size,
+        TileTextureIndex(2),
+        TilePos { x: 3, y: 1 },
+        TilemapSize { x: 1, y: 3 },
         tilemap_id,
         &mut commands,
         &mut tile_storage,
     );
-
     fill_tilemap_rect(
         TileTextureIndex(1),
-        TilePos {
-            x: QUADRANT_SIDE_LENGTH,
-            y: 0,
-        },
-        quadrant_size,
+        TilePos { x: 0, y: 0 },
+        TilemapSize { x: 3, y: 1 },
         tilemap_id,
         &mut commands,
         &mut tile_storage,
     );
-
     fill_tilemap_rect(
-        TileTextureIndex(2),
-        TilePos {
-            x: 0,
-            y: QUADRANT_SIDE_LENGTH,
-        },
-        quadrant_size,
+        TileTextureIndex(0),
+        TilePos { x: 0, y: 1 },
+        TilemapSize { x: 3, y: 3 },
         tilemap_id,
         &mut commands,
         &mut tile_storage,
     );
-
 
     let tile_size = TilemapTileSize { x: 64.0, y: 32.0 };
     let grid_size = tile_size.into();
     let map_type = TilemapType::Isometric(IsoCoordSystem::Diamond);
+
+    debug!("{:?}", tile_storage);
 
     commands.entity(tilemap_entity).insert(TilemapBundle {
         grid_size,
