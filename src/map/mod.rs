@@ -3,71 +3,90 @@ use bevy_ecs_tilemap::{TilemapPlugin, prelude::*};
 
 use crate::{GameState, loading::TextureAssets};
 
+use self::world::{TilemapLayer, CityWorld};
+
 pub mod world;
 pub struct MapPlugin;
 
-const QUADRANT_SIDE_LENGTH: u32 = 80;
+const MAX_MAP_SIZE: u32 = 256;
+const TILEMAP_TILE_SIZE: TilemapTileSize = TilemapTileSize { x: 64.0, y: 32.0 };
+const TILEMAP_SIZE: TilemapSize = TilemapSize { x: MAX_MAP_SIZE, y: MAX_MAP_SIZE };
 
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(TilemapPlugin)
-            .add_systems(OnEnter(GameState::Playing), startup);
+            .register_type::<world::CityWorld>()
+            .register_type::<world::TilemapLayer>()
+            .add_systems(OnEnter(GameState::Playing), startup)
+            .add_systems(Update, refresh_map_size.run_if(in_state(GameState::Playing)));
     }
 }
+pub fn startup(mut commands: Commands, assets: Res<TextureAssets>) {
+    /*let tilemap_selector_entity = commands.spawn(
+        (TilemapBundle {
+            size: TilemapSize {
+                x: MAX_MAP_SIZE,
+                y: MAX_MAP_SIZE,
+            },
+            texture: TilemapTexture::Single(assets.texture_selector.clone()),
+            tile_size: TILEMAP_TILE_SIZE,
+            ..Default::default()
+        },
+        TilemapLayer::Selector)
+    ).id();**/
 
-fn startup(mut commands: Commands, assets: Res<TextureAssets>) {
-    // OpenTTD Default Map Size + 1
-    let map_size = TilemapSize {
-        x: 257,
-        y: 257,
-    };
-    let quadrant_size = TilemapSize {
-        x: QUADRANT_SIDE_LENGTH,
-        y: QUADRANT_SIDE_LENGTH,
-    };
-    let mut tile_storage = TileStorage::empty(map_size);
-    let tilemap_entity = commands.spawn_empty().id();
-    let tilemap_id = TilemapId(tilemap_entity);
-    
-    fill_tilemap_rect(
-        TileTextureIndex(2),
-        TilePos { x: 3, y: 1 },
-        TilemapSize { x: 1, y: 3 },
-        tilemap_id,
-        &mut commands,
-        &mut tile_storage,
-    );
-    fill_tilemap_rect(
-        TileTextureIndex(1),
-        TilePos { x: 0, y: 0 },
-        TilemapSize { x: 3, y: 1 },
-        tilemap_id,
-        &mut commands,
-        &mut tile_storage,
-    );
-    fill_tilemap_rect(
-        TileTextureIndex(0),
-        TilePos { x: 0, y: 1 },
-        TilemapSize { x: 3, y: 3 },
-        tilemap_id,
-        &mut commands,
-        &mut tile_storage,
-    );
+    commands.spawn(
+        (TilemapBundle {
+            grid_size: TILEMAP_TILE_SIZE.into(),
+            size: TILEMAP_SIZE,
+            texture: TilemapTexture::Single(assets.texture_floor.clone()),
+            tile_size: TILEMAP_TILE_SIZE,
+            storage: TileStorage::empty(TILEMAP_SIZE),
+            map_type: TilemapType::Isometric(IsoCoordSystem::Diamond),
+            ..Default::default()
+        },
+        TilemapLayer::Floor,
+        CityWorld{
+            map_size: 3,
+            ..Default::default()
+        })
+    )
+    //.add_child(tilemap_selector_entity)
+    ;
 
-    let tile_size = TilemapTileSize { x: 64.0, y: 32.0 };
-    let grid_size = tile_size.into();
-    let map_type = TilemapType::Isometric(IsoCoordSystem::Diamond);
+}
 
-    debug!("{:?}", tile_storage);
+pub fn refresh_map_size(
+    mut commands: Commands,
+    mut last_update_query: Query<(Entity, &mut CityWorld, &mut TileStorage)>
+) {
 
-    commands.entity(tilemap_entity).insert(TilemapBundle {
-        grid_size,
-        size: map_size,
-        storage: tile_storage,
-        texture: TilemapTexture::Single(assets.texture_floor.clone()),
-        tile_size,
-        map_type,
-        transform: get_tilemap_center_transform(&map_size, &grid_size, &map_type, 0.0),
-        ..Default::default()
-    });
-}  
+    for (entity, mut world, mut storage) in last_update_query.iter_mut() {
+        if world.map_size > MAX_MAP_SIZE || world.map_size < world.last_map_size {
+            world.map_size = world.last_map_size;
+        }
+        if world.map_size != world.last_map_size {
+            // update the map size in the storage
+            // loop x and y + 1 because 0 is dedicated to decorations
+            for x in 1..world.map_size + 1 {
+                for y in 1..world.map_size + 1{
+                    // get in storage if there is a tile, if not create a new one
+                    let tile_pos = &TilePos { x, y };
+                    let tile = storage.get(tile_pos);
+                    if tile.is_none() {
+
+                        let tile_entity = commands.spawn(TileBundle {
+                            tilemap_id: TilemapId(entity),
+                            position: *tile_pos,
+                            texture_index: TileTextureIndex(0),
+                            ..Default::default()
+                        }).id();
+
+                        storage.set(tile_pos, tile_entity)
+                    }
+                }
+            }
+            world.last_map_size = world.map_size;
+        }
+    }
+}
