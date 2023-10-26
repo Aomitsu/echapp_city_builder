@@ -1,20 +1,19 @@
 use bevy::app::App;
 #[cfg(debug_assertions)]
 use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
+use bevy::prelude::*;
 #[cfg(debug_assertions)]
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
-use bevy::prelude::*;
 
-mod loading;
-mod menu;
-mod map;
 mod camera;
+mod loading;
+mod map;
+mod menu;
 
 use camera::CameraPlugin;
 use loading::LoadingPlugin;
-use menu::MenuPlugin;
 use map::MapPlugin;
-
+use menu::MenuPlugin;
 
 #[derive(States, Default, Clone, Eq, PartialEq, Debug, Hash)]
 enum GameState {
@@ -37,7 +36,11 @@ impl Plugin for GamePlugin {
 
         #[cfg(debug_assertions)]
         {
-            app.add_plugins((FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin::default(), WorldInspectorPlugin::new()));
+            app.add_plugins((
+                FrameTimeDiagnosticsPlugin,
+                LogDiagnosticsPlugin::default(),
+                WorldInspectorPlugin::new(),
+            ));
         }
     }
 }

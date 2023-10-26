@@ -1,16 +1,19 @@
 use bevy::prelude::*;
-use bevy_ecs_tilemap::{TilemapPlugin, prelude::*};
+use bevy_ecs_tilemap::{prelude::*, TilemapPlugin};
 
-use crate::{GameState, loading::TextureAssets};
+use crate::{loading::TextureAssets, GameState};
 
-use self::world::{TilemapLayer, CityWorld};
+use self::world::{CityWorld, TilemapLayer};
 
 pub mod world;
 pub struct MapPlugin;
 
 const MAX_MAP_SIZE: u32 = 256;
 const TILEMAP_TILE_SIZE: TilemapTileSize = TilemapTileSize { x: 64.0, y: 32.0 };
-const TILEMAP_SIZE: TilemapSize = TilemapSize { x: MAX_MAP_SIZE, y: MAX_MAP_SIZE };
+const TILEMAP_SIZE: TilemapSize = TilemapSize {
+    x: MAX_MAP_SIZE,
+    y: MAX_MAP_SIZE,
+};
 
 impl Plugin for MapPlugin {
     fn build(&self, app: &mut App) {
@@ -18,7 +21,10 @@ impl Plugin for MapPlugin {
             .register_type::<world::CityWorld>()
             .register_type::<world::TilemapLayer>()
             .add_systems(OnEnter(GameState::Playing), startup)
-            .add_systems(Update, refresh_map_size.run_if(in_state(GameState::Playing)));
+            .add_systems(
+                Update,
+                refresh_map_size.run_if(in_state(GameState::Playing)),
+            );
     }
 }
 pub fn startup(mut commands: Commands, assets: Res<TextureAssets>) {
@@ -53,14 +59,12 @@ pub fn startup(mut commands: Commands, assets: Res<TextureAssets>) {
     )
     //.add_child(tilemap_selector_entity)
     ;
-
 }
 
 pub fn refresh_map_size(
     mut commands: Commands,
-    mut last_update_query: Query<(Entity, &mut CityWorld, &mut TileStorage)>
+    mut last_update_query: Query<(Entity, &mut CityWorld, &mut TileStorage)>,
 ) {
-
     for (entity, mut world, mut storage) in last_update_query.iter_mut() {
         if world.map_size > MAX_MAP_SIZE || world.map_size < world.last_map_size {
             world.map_size = world.last_map_size;
@@ -69,18 +73,19 @@ pub fn refresh_map_size(
             // update the map size in the storage
             // loop x and y + 1 because 0 is dedicated to decorations
             for x in 1..world.map_size + 1 {
-                for y in 1..world.map_size + 1{
+                for y in 1..world.map_size + 1 {
                     // get in storage if there is a tile, if not create a new one
                     let tile_pos = &TilePos { x, y };
                     let tile = storage.get(tile_pos);
                     if tile.is_none() {
-
-                        let tile_entity = commands.spawn(TileBundle {
-                            tilemap_id: TilemapId(entity),
-                            position: *tile_pos,
-                            texture_index: TileTextureIndex(0),
-                            ..Default::default()
-                        }).id();
+                        let tile_entity = commands
+                            .spawn(TileBundle {
+                                tilemap_id: TilemapId(entity),
+                                position: *tile_pos,
+                                texture_index: TileTextureIndex(0),
+                                ..Default::default()
+                            })
+                            .id();
 
                         storage.set(tile_pos, tile_entity)
                     }

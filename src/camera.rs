@@ -12,7 +12,7 @@ impl Plugin for CameraPlugin {
 
 /// TODO: TEMP !!!!!
 /// Stolen from : https://github.com/StarArawn/bevy_ecs_tilemap/blob/main/examples/helpers/camera.rs
-/// 
+///
 /// MIT License ( I use the entiere lib so it's fine, I put the credit in Main Menu/Licenses )
 pub fn movement(
     time: Res<Time>,

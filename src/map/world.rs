@@ -10,12 +10,16 @@ pub struct CityWorld {
     /// Maxmap size is hardcoded to 257*257 ( 256*256 without decorations)
     pub map_size: u32,
     pub last_map_size: u32,
-
 }
 
 impl Default for CityWorld {
     fn default() -> Self {
-        Self { blocks: Default::default(), selector: Default::default(), map_size: Default::default(), last_map_size: Default::default() }
+        Self {
+            blocks: Default::default(),
+            selector: Default::default(),
+            map_size: Default::default(),
+            last_map_size: Default::default(),
+        }
     }
 }
 

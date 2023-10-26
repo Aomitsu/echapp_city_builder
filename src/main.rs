@@ -6,15 +6,18 @@
 
 use std::io::Cursor;
 
-use bevy::{prelude::*, winit::WinitWindows, window::{PrimaryWindow, PresentMode}};
+use bevy::{
+    prelude::*,
+    window::{PresentMode, PrimaryWindow},
+    winit::WinitWindows,
+};
 use echapp_city_builder::GamePlugin;
 use winit::window::Icon;
 
 fn main() {
     App::new()
-    .add_plugins(
-        DefaultPlugins
-            .set(WindowPlugin {
+        .add_plugins(
+            DefaultPlugins.set(WindowPlugin {
                 primary_window: Some(Window {
                     present_mode: PresentMode::Immediate,
                     resizable: false,
@@ -22,9 +25,8 @@ fn main() {
                     ..default()
                 }),
                 ..default()
-            })
-            //.set(ImagePlugin::default_nearest()),
-    )
+            }), //.set(ImagePlugin::default_nearest()),
+        )
         .add_plugins(GamePlugin)
         .add_systems(Startup, (setup, set_window_icon))
         .run();
@@ -37,9 +39,7 @@ fn set_window_icon(
 ) {
     let primary_entity = primary_window.single();
     let primary = windows.get_window(primary_entity).unwrap();
-    let icon_buf = Cursor::new(include_bytes!(
-        "../assets/icon.png"
-    ));
+    let icon_buf = Cursor::new(include_bytes!("../assets/icon.png"));
     if let Ok(image) = image::load(icon_buf, image::ImageFormat::Png) {
         let image = image.into_rgba8();
         let (width, height) = image.dimensions();
