@@ -9,11 +9,13 @@ mod camera;
 mod loading;
 mod map;
 mod menu;
+mod actions;
 
 use camera::CameraPlugin;
 use loading::LoadingPlugin;
 use map::MapPlugin;
 use menu::MenuPlugin;
+use actions::ActionPlugin;
 
 #[derive(States, Default, Clone, Eq, PartialEq, Debug, Hash)]
 enum GameState {
@@ -32,6 +34,7 @@ impl Plugin for GamePlugin {
             MenuPlugin,
             MapPlugin,
             CameraPlugin,
+            ActionPlugin,
         ));
 
         #[cfg(debug_assertions)]
