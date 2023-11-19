@@ -47,3 +47,13 @@ impl Plugin for GamePlugin {
         }
     }
 }
+
+
+pub mod prelude {
+    pub use crate::map::world::*;
+    pub use crate::menu::*;
+    pub use crate::loading::*;
+    pub use crate::map::*;
+    pub use crate::camera::*;
+    pub use crate::actions::*;
+}

@@ -4,11 +4,20 @@ use crate::GameState;
 
 pub struct CameraPlugin;
 
+#[derive(Component)]
+pub struct MainCamera;
+
+
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
-        app.add_systems(Update, movement.run_if(in_state(GameState::Playing)));
+        app.add_systems(Startup, setup)
+        .add_systems(Update, movement.run_if(in_state(GameState::Playing)));
     }
 }
+fn setup(mut commands: Commands) {
+    commands.spawn((Camera2dBundle::default(), MainCamera));
+}
+
 
 /// TODO: TEMP !!!!!
 /// Stolen from : https://github.com/StarArawn/bevy_ecs_tilemap/blob/main/examples/helpers/camera.rs
@@ -39,15 +48,15 @@ pub fn movement(
         }
 
         if keyboard_input.pressed(KeyCode::A) {
-            ortho.scale += 0.1;
+            ortho.scale += 0.01;
         }
 
         if keyboard_input.pressed(KeyCode::E) {
-            ortho.scale -= 0.1;
+            ortho.scale -= 0.01;
         }
 
-        if ortho.scale < 0.5 {
-            ortho.scale = 0.5;
+        if ortho.scale < 0.1 {
+            ortho.scale = 0.1;
         }
 
         let z = transform.translation.z;

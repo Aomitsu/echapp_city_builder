@@ -13,8 +13,11 @@ use bevy::{
 };
 use echapp_city_builder::GamePlugin;
 use winit::window::Icon;
+use dotenv::dotenv;
 
 fn main() {
+    dotenv().ok();
+
     App::new()
         .add_plugins(
             DefaultPlugins.set(WindowPlugin {
@@ -25,10 +28,10 @@ fn main() {
                     ..default()
                 }),
                 ..default()
-            }), //.set(ImagePlugin::default_nearest()),
+            }).set(ImagePlugin::default_nearest()),
         )
         .add_plugins(GamePlugin)
-        .add_systems(Startup, (setup, set_window_icon))
+        .add_systems(Startup, set_window_icon)
         .run();
 }
 
@@ -47,8 +50,4 @@ fn set_window_icon(
         let icon = Icon::from_rgba(rgba, width, height).unwrap();
         primary.set_window_icon(Some(icon));
     };
-}
-
-fn setup(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
 }
