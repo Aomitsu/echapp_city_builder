@@ -7,17 +7,15 @@ pub struct CameraPlugin;
 #[derive(Component)]
 pub struct MainCamera;
 
-
 impl Plugin for CameraPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
         app.add_systems(Startup, setup)
-        .add_systems(Update, movement.run_if(in_state(GameState::Playing)));
+            .add_systems(Update, movement.run_if(in_state(GameState::Playing)));
     }
 }
 fn setup(mut commands: Commands) {
     commands.spawn((Camera2dBundle::default(), MainCamera));
 }
-
 
 /// TODO: TEMP !!!!!
 /// Stolen from : https://github.com/StarArawn/bevy_ecs_tilemap/blob/main/examples/helpers/camera.rs

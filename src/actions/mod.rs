@@ -1,6 +1,6 @@
 use bevy::prelude::*;
 
-use self::input::mouse::{MouseToWorldCoords, cursor_to_world_system};
+use self::input::mouse::{cursor_to_world_system, MouseToWorldCoords};
 
 pub mod input;
 

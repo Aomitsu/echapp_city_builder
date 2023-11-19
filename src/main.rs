@@ -11,24 +11,26 @@ use bevy::{
     window::{PresentMode, PrimaryWindow},
     winit::WinitWindows,
 };
+use dotenv::dotenv;
 use echapp_city_builder::GamePlugin;
 use winit::window::Icon;
-use dotenv::dotenv;
 
 fn main() {
     dotenv().ok();
 
     App::new()
         .add_plugins(
-            DefaultPlugins.set(WindowPlugin {
-                primary_window: Some(Window {
-                    present_mode: PresentMode::Immediate,
-                    resizable: false,
-                    title: "City Builder".into(),
+            DefaultPlugins
+                .set(WindowPlugin {
+                    primary_window: Some(Window {
+                        present_mode: PresentMode::Immediate,
+                        resizable: false,
+                        title: "City Builder".into(),
+                        ..default()
+                    }),
                     ..default()
-                }),
-                ..default()
-            }).set(ImagePlugin::default_nearest()),
+                })
+                .set(ImagePlugin::default_nearest()),
         )
         .add_plugins(GamePlugin)
         .add_systems(Startup, set_window_icon)

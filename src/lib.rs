@@ -5,17 +5,17 @@ use bevy::prelude::*;
 #[cfg(debug_assertions)]
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 
+mod actions;
 mod camera;
 mod loading;
 mod map;
 mod menu;
-mod actions;
 
+use actions::ActionPlugin;
 use camera::CameraPlugin;
 use loading::LoadingPlugin;
 use map::MapPlugin;
 use menu::MenuPlugin;
-use actions::ActionPlugin;
 
 #[derive(States, Default, Clone, Eq, PartialEq, Debug, Hash)]
 enum GameState {
@@ -48,12 +48,11 @@ impl Plugin for GamePlugin {
     }
 }
 
-
 pub mod prelude {
-    pub use crate::map::world::*;
-    pub use crate::menu::*;
-    pub use crate::loading::*;
-    pub use crate::map::*;
-    pub use crate::camera::*;
     pub use crate::actions::*;
+    pub use crate::camera::*;
+    pub use crate::loading::*;
+    pub use crate::map::world::*;
+    pub use crate::map::*;
+    pub use crate::menu::*;
 }

@@ -16,7 +16,8 @@ pub fn cursor_to_world_system(
     let (camera, camera_transform) = query_camera.single();
     let window = query_window.single();
 
-    if let Some(world_position) = window.cursor_position()
+    if let Some(world_position) = window
+        .cursor_position()
         .and_then(|cursor| camera.viewport_to_world(camera_transform, cursor))
         .map(|ray| ray.origin.truncate())
     {

@@ -1,12 +1,16 @@
 use std::collections::HashMap;
 
 use bevy::prelude::*;
-use bevy_ecs_tilemap::{tiles::{TilePos, TileBundle, TileTextureIndex, TileStorage}, map::{TilemapId, TilemapTexture}, TilemapBundle};
+use bevy_ecs_tilemap::{
+    map::{TilemapId, TilemapTexture},
+    tiles::{TileBundle, TilePos, TileStorage, TileTextureIndex},
+    TilemapBundle,
+};
 use bevy_enum_filter::EnumFilter;
 
 use crate::prelude::TextureAssets;
 
-use super::{MAX_MAP_SIZE, TILEMAP_TILE_SIZE, TILEMAP_SIZE, TILEMAP_TYPE};
+use super::{MAX_MAP_SIZE, TILEMAP_SIZE, TILEMAP_TILE_SIZE, TILEMAP_TYPE};
 
 #[derive(Component, Reflect)]
 pub struct CityWorld {
@@ -46,7 +50,7 @@ pub enum CityAssignation {
 }
 
 #[derive(Debug, Default, Component, EnumFilter, Reflect)]
-pub enum TilemapLayer{
+pub enum TilemapLayer {
     Floor = 1,
     Selector = 2,
     Assets = 3,
@@ -55,8 +59,8 @@ pub enum TilemapLayer{
 }
 
 pub fn spawn_tilemap(mut commands: Commands, assets: Res<TextureAssets>) {
-    commands.spawn(
-        (TilemapBundle {
+    commands.spawn((
+        TilemapBundle {
             grid_size: TILEMAP_TILE_SIZE.into(),
             size: TILEMAP_SIZE,
             texture: TilemapTexture::Single(assets.texture_floor.clone()),
@@ -66,11 +70,11 @@ pub fn spawn_tilemap(mut commands: Commands, assets: Res<TextureAssets>) {
             ..Default::default()
         },
         TilemapLayer::Floor,
-        CityWorld{
+        CityWorld {
             map_size: 3,
             ..Default::default()
-        })
-    );
+        },
+    ));
 }
 
 pub fn update_map_size(

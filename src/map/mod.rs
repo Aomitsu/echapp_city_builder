@@ -2,12 +2,12 @@ use bevy::prelude::*;
 use bevy_ecs_tilemap::{prelude::*, TilemapPlugin};
 use bevy_enum_filter::prelude::AddEnumFilter;
 
-use crate::{loading::TextureAssets, GameState};
+use crate::GameState;
 
-use self::world::{CityWorld, TilemapLayer};
+use self::world::TilemapLayer;
 
-pub mod world;
 pub mod selector;
+pub mod world;
 pub struct MapPlugin;
 
 const MAX_MAP_SIZE: u32 = 256;
@@ -24,17 +24,18 @@ impl Plugin for MapPlugin {
             .register_type::<world::CityWorld>()
             .register_type::<world::TilemapLayer>()
             .add_enum_filter::<TilemapLayer>()
-            .add_systems(OnEnter(GameState::Playing), (
-                world::spawn_tilemap,
-                selector::create_selector
-            ))
+            .add_systems(
+                OnEnter(GameState::Playing),
+                (world::spawn_tilemap, selector::create_selector),
+            )
             .add_systems(
                 Update,
                 (
                     world::update_map_size,
                     selector::update_selector_pos,
                     selector::update_selector,
-                ).run_if(in_state(GameState::Playing)),
+                )
+                    .run_if(in_state(GameState::Playing)),
             );
     }
 }
