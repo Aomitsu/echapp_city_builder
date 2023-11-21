@@ -25,6 +25,8 @@ pub struct TextureAssets {
     pub texture_icon: Handle<Image>,
     #[asset(path = "textures/floor.png")]
     pub texture_floor: Handle<Image>,
+    #[asset(path = "textures/assignment_overlay.png")]
+    pub texture_assignment_overlay: Handle<Image>,
     #[asset(path = "textures/selector.png")]
     pub texture_selector: Handle<Image>,
     #[asset(path = "textures/starter-road.png")]

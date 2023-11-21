@@ -6,9 +6,10 @@ use bevy_ecs_tilemap::{
     tiles::{TileBundle, TilePos, TileStorage, TileTextureIndex},
     TilemapBundle,
 };
-use bevy_enum_filter::EnumFilter;
+use bevy_enum_filter::{EnumFilter, Enum};
 
-use crate::prelude::TextureAssets;
+
+use crate::prelude::{TextureAssets, input::keyboard::KeyboardToggle};
 
 use super::{MAX_MAP_SIZE, TILEMAP_SIZE, TILEMAP_TILE_SIZE, TILEMAP_TYPE};
 
@@ -38,24 +39,32 @@ pub struct FloorType {
     pub assignation: CityAssignation,
 }
 
-#[derive(Debug, Default, Component, Reflect)]
+#[derive(Debug, Default, Component, Reflect, Clone, Copy)]
 pub enum CityAssignation {
-    Residential,
-    Commercial,
-    Industrial,
+    Residential = 0, // Orange
+    Commercial = 2, // Blue
+    Industrial = 1, // Yellow
     /// Can't be assigned ( Parks, Roads, Special infrastructures, )
-    CantBeAssigned,
+    CantBeAssigned = 4,
     #[default]
-    None,
+    None = 3,
 }
 
-#[derive(Debug, Default, Component, EnumFilter, Reflect)]
+
+#[derive(Component)]
+pub struct AssignationLayer;
+
+#[derive(Component)]
+pub struct AssignationTile;
+
+#[derive(Default, Component, EnumFilter)]
 pub enum TilemapLayer {
     Floor = 1,
-    Selector = 2,
-    Assets = 3,
+    Assignation = 2,
+    Selector = 3,
+    Assets = 4,
     #[default]
-    None = 4,
+    None = 5,
 }
 
 pub fn spawn_tilemap(mut commands: Commands, assets: Res<TextureAssets>) {
@@ -67,6 +76,7 @@ pub fn spawn_tilemap(mut commands: Commands, assets: Res<TextureAssets>) {
             tile_size: TILEMAP_TILE_SIZE,
             storage: TileStorage::empty(TILEMAP_SIZE),
             map_type: TILEMAP_TYPE,
+            transform: Transform::from_xyz(0.0, 0.0, TilemapLayer::Floor as i32 as f32),
             ..Default::default()
         },
         TilemapLayer::Floor,
@@ -75,13 +85,39 @@ pub fn spawn_tilemap(mut commands: Commands, assets: Res<TextureAssets>) {
             ..Default::default()
         },
     ));
+    commands.spawn((
+        TilemapBundle {
+            grid_size: TILEMAP_TILE_SIZE.into(),
+            size: TILEMAP_SIZE,
+            texture: TilemapTexture::Single(assets.texture_assignment_overlay.clone()),
+            tile_size: TILEMAP_TILE_SIZE,
+            storage: TileStorage::empty(TILEMAP_SIZE),
+            map_type: TILEMAP_TYPE,
+            transform: Transform::from_xyz(0.0, 0.0, TilemapLayer::Assignation as i32 as f32),
+            visibility: Visibility::Hidden,
+            ..Default::default()
+        },
+        TilemapLayer::Assignation,
+        AssignationLayer // TODO: need to use TilemapLayer::Assignation in the future
+    ));
 }
 
 pub fn update_map_size(
     mut commands: Commands,
-    mut last_update_query: Query<(Entity, &mut CityWorld, &mut TileStorage)>,
+    mut storage_query: Query<(
+        Entity, 
+        &mut CityWorld, 
+        &mut TileStorage
+    ), With<CityWorld>>,
+    mut assignation_layer_query: Query<(
+        Entity, 
+        &mut TileStorage,
+        With<AssignationLayer>,
+        Without<CityWorld>
+    )>
 ) {
-    let (entity, mut world, mut storage) = last_update_query.single_mut();
+    let (entity, mut world, mut storage) = storage_query.single_mut();
+    let (assignation_entity, mut assignation_storage, (), ()) = assignation_layer_query.single_mut();
     if world.map_size > MAX_MAP_SIZE || world.map_size < world.last_map_size {
         world.map_size = world.last_map_size;
     }
@@ -102,11 +138,34 @@ pub fn update_map_size(
                             ..Default::default()
                         })
                         .id();
+                    let tile_assignment_entity = commands
+                        .spawn((TileBundle {
+                            tilemap_id: TilemapId(assignation_entity),
+                            position: *tile_pos,
+                            texture_index: TileTextureIndex(CityAssignation::None as u32),
+                            ..Default::default()
+                        }, AssignationTile))
+                        .id();
 
-                    storage.set(tile_pos, tile_entity)
+                    storage.set(tile_pos, tile_entity);
+                    assignation_storage.set(tile_pos, tile_assignment_entity);
                 }
             }
         }
         world.last_map_size = world.map_size;
+    }
+}
+
+
+pub fn update_assignation_layer_visibility(
+    mut visibility_query: Query<&mut Visibility, With<AssignationLayer>>,
+    status: Res<KeyboardToggle>,
+) {
+    let mut layer = visibility_query.single_mut();
+    
+    if status.edit_mode {
+        *layer = Visibility::Visible;
+    } else {
+        *layer = Visibility::Hidden;
     }
 }

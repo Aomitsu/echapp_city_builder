@@ -22,7 +22,6 @@ impl Plugin for MapPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(TilemapPlugin)
             .register_type::<world::CityWorld>()
-            .register_type::<world::TilemapLayer>()
             .add_enum_filter::<TilemapLayer>()
             .add_systems(
                 OnEnter(GameState::Playing),
@@ -32,6 +31,7 @@ impl Plugin for MapPlugin {
                 Update,
                 (
                     world::update_map_size,
+                    world::update_assignation_layer_visibility,
                     selector::update_selector_pos,
                     selector::update_selector,
                 )
