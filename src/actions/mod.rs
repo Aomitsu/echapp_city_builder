@@ -1,9 +1,12 @@
 use bevy::prelude::*;
 use bevy_inspector_egui::quick::ResourceInspectorPlugin;
 
-use crate::{GameState, prelude::input::mouse};
+use crate::{prelude::input::mouse, GameState};
 
-use self::input::{mouse::{cursor_to_world_system, MouseToWorldCoords}, keyboard::{KeyboardToggle, game_keyboard_input}};
+use self::input::{
+    keyboard::{game_keyboard_input, KeyboardToggle},
+    mouse::{cursor_to_world_system, MouseToWorldCoords},
+};
 
 pub mod input;
 
@@ -17,10 +20,7 @@ impl Plugin for ActionPlugin {
             .add_systems(Update, cursor_to_world_system)
             .add_systems(
                 Update,
-                (
-                    game_keyboard_input,
-                    mouse::edit_mode_click_system
-                )
+                (game_keyboard_input, mouse::edit_mode_click_system)
                     .run_if(in_state(GameState::Playing)),
             );
     }
