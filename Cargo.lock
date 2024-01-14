@@ -1549,6 +1549,7 @@ dependencies = [
  "bevy-inspector-egui",
  "bevy_asset_loader",
  "bevy_ecs_tilemap",
+ "bevy_egui",
  "bevy_enum_filter",
  "dotenv",
  "image",

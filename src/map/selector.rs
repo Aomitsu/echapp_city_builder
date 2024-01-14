@@ -1,12 +1,12 @@
 use bevy::prelude::*;
-use bevy_ecs_tilemap::tiles::TilePos;
+use bevy_ecs_tilemap::tiles::{TilePos, TileTextureIndex};
 
 use crate::{
     map::TILEMAP_SIZE,
-    prelude::{input::mouse::MouseToWorldCoords, world::CityWorld, TextureAssets},
+    prelude::{input::{mouse::MouseToWorldCoords, keyboard::KeyboardToggle}, world::CityWorld, TextureAssets},
 };
 
-use super::{world::TilemapLayer, TILEMAP_TILE_SIZE, TILEMAP_TYPE};
+use super::{world::{TilemapLayer, AssignationTile}, TILEMAP_TILE_SIZE, TILEMAP_TYPE};
 
 #[derive(Component)]
 pub struct SelectorEntity;
@@ -65,5 +65,27 @@ pub fn update_selector(
             TilemapLayer::Selector as i32 as f32,
         );
         *visible = Visibility::Visible;
+    }
+}
+
+pub fn edit_mode_click_system(
+    buttons: Res<Input<MouseButton>>,
+    game_mode: Res<KeyboardToggle>,
+    city_world_query: Query<&CityWorld>,
+    mut assignation_layer_query: Query<(&TilePos, &mut TileTextureIndex, With<AssignationTile>)>,
+) {
+    if game_mode.edit_mode {
+        if buttons.just_pressed(MouseButton::Left) {
+            // Loop inside query
+            let city_world = city_world_query.single();
+            for (tile_pos, mut tile_texture_index, _) in assignation_layer_query.iter_mut() {
+                if tile_pos.x == city_world.selector.unwrap_or(IVec2::ZERO).x as u32
+                    && tile_pos.y == city_world.selector.unwrap_or(IVec2::ZERO).y as u32
+                {
+                    *tile_texture_index = TileTextureIndex(game_mode.assignement_to_set as u32);
+                    return;
+                }
+            }
+        }
     }
 }

@@ -8,6 +8,7 @@ use self::world::TilemapLayer;
 
 pub mod selector;
 pub mod world;
+pub mod entity;
 pub struct MapPlugin;
 
 const MAX_MAP_SIZE: u32 = 256;
@@ -32,6 +33,7 @@ impl Plugin for MapPlugin {
                 (
                     world::update_map_size,
                     world::update_assignation_layer_visibility,
+                    selector::edit_mode_click_system,
                     selector::update_selector_pos,
                     selector::update_selector,
                 )

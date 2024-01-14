@@ -10,12 +10,16 @@ mod camera;
 mod loading;
 mod map;
 mod menu;
+#[cfg(debug_assertions)]
+mod debug;
 
 use actions::ActionPlugin;
 use camera::CameraPlugin;
 use loading::LoadingPlugin;
 use map::MapPlugin;
 use menu::MenuPlugin;
+#[cfg(debug_assertions)]
+use debug::DebugPlugin;
 
 #[derive(States, Default, Clone, Eq, PartialEq, Debug, Hash)]
 enum GameState {
@@ -43,6 +47,7 @@ impl Plugin for GamePlugin {
                 FrameTimeDiagnosticsPlugin,
                 LogDiagnosticsPlugin::default(),
                 WorldInspectorPlugin::new(),
+                DebugPlugin,
             ));
         }
     }

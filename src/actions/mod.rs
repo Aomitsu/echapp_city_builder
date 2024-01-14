@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{prelude::*, input::common_conditions::input_pressed};
 use bevy_inspector_egui::quick::ResourceInspectorPlugin;
 
 use crate::{prelude::input::mouse, GameState};
@@ -20,8 +20,10 @@ impl Plugin for ActionPlugin {
             .add_systems(Update, cursor_to_world_system)
             .add_systems(
                 Update,
-                (game_keyboard_input, mouse::edit_mode_click_system)
+                (game_keyboard_input,
+                    mouse::edit_mode_click_system)
                     .run_if(in_state(GameState::Playing)),
+                    
             );
     }
 }
